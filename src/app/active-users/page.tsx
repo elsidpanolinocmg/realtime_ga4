@@ -1,6 +1,6 @@
 // app/active-users/page.tsx
 import React from "react";
-import Odometer from "@/components/Odometer";
+import Odometer from "@/src/components/Odometer";
 
 interface SearchParams {
   fontSize?: string;
