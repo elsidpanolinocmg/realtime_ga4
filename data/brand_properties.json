@@ -1,15 +1,19 @@
 {
     "sbr": {
-        "name": "Singapore Business Review"
+        "name": "Singapore Business Review",
+        "image": "logo/sbr.png"
     },
     "hkb": {
-        "name": "Hongkong Business Review"
+        "name": "Hongkong Business Review",
+        "image": "logo/hkb.png"
     },
     "abf": {
-        "name": "Asian Banking and Finance"
+        "name": "Asian Banking and Finance",
+        "image": "logo/abf.png"
     },
     "abr": {
         "name": "Asian Business Review",
+        "image": "logo/abr.png",
         "ga4_filter": {
             "fieldName": "hostName",
             "stringFilter": {
@@ -19,71 +23,92 @@
         }
     },
     "ia": {
-        "name": "Insurance Asia"
+        "name": "Insurance Asia",
+        "image": "logo/ia.png"
     },
     "ra": {
-        "name": "Retail Asia"
+        "name": "Retail Asia",
+        "image": "logo/ra.png"
     },
     "ap": {
-        "name": "Asian Power"
+        "name": "Asian Power",
+        "image": "logo/ap.png"
     },
     "hca": {
-        "name": "Healthcare Asia"
+        "name": "Healthcare Asia",
+        "image": "logo/hca.png"
     },
     "qsr": {
         "name": "QSR Media",
+        "image": "logo/QSR-MEDIA.png",
         "group": "qsr_media_group"
+
     },
     "qsr-asia": {
         "name": "QSR Asia",
+        "image": "logo/QSR-ASIA.png",
         "group": "qsr_media_group"
     },
     "qsr-aus": {
         "name": "QSR Australia",
+        "image": "logo/QSR-AUS.png",
         "group": "qsr_media_group"
     },
     "qsr-uk": {
         "name": "QSR UK",
+        "image": "logo/QSR-UK.png",
         "group": "qsr_media_group"
     },
     "agri": {
         "name": "Agribusiness World"
     },
     "apb": {
-        "name": "APB+"
+        "name": "APB+",
+        "image": "logo/APB+.png"
     },
     "at": {
-        "name": "Asian Telecom"
+        "name": "Asian Telecom",
+        "image": "logo/at.png"
     },
     "awards": {
-        "name": "Awards Info"
+        "name": "Awards Info",
+        "image": "logo/Awards-Info.png"
     },
     "cmg": {
-        "name": "Charlton Media"
+        "name": "Charlton Media",
+        "image": "logo/cmg.png"
     },
     "drinks": {
-        "name": "Drinks Asia"
+        "name": "Drinks Asia",
+        "image": "logo/Drinks-Asia.png"
     },
     "esgb": {
-        "name": "ESGBusiness"
+        "name": "ESGBusiness",
+        "image": "logo/ESG business.png"
     },
     "fmcg": {
-        "name": "FMCG Asia"
+        "name": "FMCG Asia",
+        "image": "logo/fmcgasia.png"
     },
     "food": {
-        "name": "Food Asia"
+        "name": "Food Asia",
+        "image": "logo/Food-Asia.png"
     },
     "gm": {
-        "name": "Gov Media"
+        "name": "Gov Media",
+        "image": "logo/Gov Media.png"
     },
     "invest": {
-        "name": "Investment Asia"
+        "name": "Investment Asia",
+        "image": "logo/investmentasia.png"
     },
     "ma": {
-        "name": "Manufacturing Asia"
+        "name": "Manufacturing Asia",
+        "image": "logo/manufacture-asia.png"
     },
     "mir": {
-        "name": "Marine & Industrial Report"
+        "name": "Marine & Industrial Report",
+        "image": "logo/mir.png"
     },
     "maritime": {
         "name": "Maritime World"
@@ -92,12 +117,15 @@
         "name": "Middle East Business"
     },
     "newsflash": {
-        "name": "NewsFlash Asia"
+        "name": "NewsFlash Asia",
+        "image": "logo/NewsFlash Asia.png"
     },
     "rea": {
-        "name": "Real Estate Asia"
+        "name": "Real Estate Asia",
+        "image": "logo/REA.png"
     },
     "tdm": {
-        "name": "Travel Daily Media"
+        "name": "Travel Daily Media",
+        "image": "logo/tdm.png"
     }
 }
