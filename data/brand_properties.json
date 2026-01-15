@@ -8,7 +8,7 @@
         "image": "logo/HKB.png"
     },
     "abf": {
-        "name": "Asian Banking and Finance",
+        "name": "Asian Banking & Finance",
         "image": "logo/ABF.png"
     },
     "abr": {
@@ -63,7 +63,7 @@
         "name": "Agribusiness World"
     },
     "apb": {
-        "name": "APB+",
+        "name": "Asia-Pacific Broadcasting+",
         "image": "logo/APB+.png"
     },
     "at": {
@@ -75,11 +75,11 @@
         "image": "logo/Awards-Info.png"
     },
     "cmg": {
-        "name": "Charlton Media",
+        "name": "Charlton Media Group",
         "image": "logo/cmg.png"
     },
     "drinks": {
-        "name": "Drinks Asia",
+        "name": "DrinksAsia",
         "image": "logo/Drinks-Asia.png"
     },
     "esgb": {
@@ -91,11 +91,11 @@
         "image": "logo/fmcgasia.png"
     },
     "food": {
-        "name": "Food Asia",
+        "name": "FoodAsia",
         "image": "logo/Food-Asia.png"
     },
     "gm": {
-        "name": "Gov Media",
+        "name": "GovMedia",
         "image": "logo/Gov Media.png"
     },
     "invest": {
@@ -117,7 +117,7 @@
         "name": "Middle East Business"
     },
     "newsflash": {
-        "name": "NewsFlash Asia",
+        "name": "Newsflash Asia",
         "image": "logo/Newsflash Asia.png"
     },
     "rea": {
