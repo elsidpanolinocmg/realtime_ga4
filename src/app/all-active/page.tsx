@@ -243,7 +243,7 @@ export default function AllStatsPage() {
                   return (
                     <tr key={row.brand}>
                       <td style={td} className="flex items-center gap-2">
-                        <img src={img} alt="" className="w-6 h-6 object-contain" />
+                        <div className="w-30"><img src={img} alt="" className="w-full h-7 drop-shadow-md object-contain" /></div>
                         {displayName}
                       </td>
                       <td style={td}>{row.stats["365"]?.toLocaleString() ?? "—"}</td>
@@ -266,7 +266,7 @@ export default function AllStatsPage() {
                     className="p-2 border text-gray-600 max-w-l w-full flex flex-col border-gray-400 rounded shadow-sm bg-gray-50"
                   >
                     <div className="flex items-center gap-2 font-bold text-lg mb-2 text-gray-800">
-                      <img src={img} alt="" className="w-10 h-10 object-contain" />
+                      <img src={img} alt="" className="w-10 h-10 object-contain shadow-sm" />
                       {displayName}
                     </div>
                     <div>Now: <span className="font-bold text-gray-800">{row.stats.now?.toLocaleString() ?? "—"}</span></div>
@@ -302,7 +302,7 @@ const th: React.CSSProperties = {
 };
 
 const td: React.CSSProperties = {
-  padding: "1px",
+  padding: "2px",
   borderBottom: "1px solid #cccccc43",
   fontSize: "1rem",
 };

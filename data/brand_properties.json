@@ -1,19 +1,19 @@
 {
     "sbr": {
         "name": "Singapore Business Review",
-        "image": "logo/sbr.png"
+        "image": "logo/SBR.png"
     },
     "hkb": {
         "name": "Hongkong Business Review",
-        "image": "logo/hkb.png"
+        "image": "logo/HKB.png"
     },
     "abf": {
         "name": "Asian Banking and Finance",
-        "image": "logo/abf.png"
+        "image": "logo/ABF.png"
     },
     "abr": {
         "name": "Asian Business Review",
-        "image": "logo/abr.png",
+        "image": "logo/ABR.png",
         "ga4_filter": {
             "fieldName": "hostName",
             "stringFilter": {
@@ -24,19 +24,19 @@
     },
     "ia": {
         "name": "Insurance Asia",
-        "image": "logo/ia.png"
+        "image": "logo/IA.png"
     },
     "ra": {
         "name": "Retail Asia",
-        "image": "logo/ra.png"
+        "image": "logo/RA.png"
     },
     "ap": {
         "name": "Asian Power",
-        "image": "logo/ap.png"
+        "image": "logo/AP.png"
     },
     "hca": {
         "name": "Healthcare Asia",
-        "image": "logo/hca.png"
+        "image": "logo/HCA.png"
     },
     "qsr": {
         "name": "QSR Media",
@@ -68,7 +68,7 @@
     },
     "at": {
         "name": "Asian Telecom",
-        "image": "logo/at.png"
+        "image": "logo/AT.png"
     },
     "awards": {
         "name": "Awards Info",
@@ -118,7 +118,7 @@
     },
     "newsflash": {
         "name": "NewsFlash Asia",
-        "image": "logo/NewsFlash Asia.png"
+        "image": "logo/Newsflash Asia.png"
     },
     "rea": {
         "name": "Real Estate Asia",
@@ -126,6 +126,6 @@
     },
     "tdm": {
         "name": "Travel Daily Media",
-        "image": "logo/tdm.png"
+        "image": "logo/TDM.png"
     }
 }
