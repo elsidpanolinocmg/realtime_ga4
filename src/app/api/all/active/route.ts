@@ -20,7 +20,6 @@ interface GA4Filter {
   stringFilter: StringFilter;
 }
 
-// Local type for GA4 dimensionFilter
 interface GA4FilterExpression {
   filter: GA4Filter;
 }
@@ -45,65 +44,34 @@ interface CacheEntry {
 }
 
 // ---------------- Constants ----------------
-let BRAND_PROPERTIES: Record<string, BrandProperty> =
+const BRAND_PROPERTIES: Record<string, BrandProperty> =
   BRAND_PROPERTIES_RAW as Record<string, BrandProperty>;
-let GA4_PROPS: Record<string, string> = GA4_PROPERTIES_RAW as Record<
+const GA4_PROPS: Record<string, string> = GA4_PROPERTIES_RAW as Record<
   string,
   string
 >;
 
-const TTL = {
-  now: 60_000,
-  today: 5 * 60_000,
-  "30": 30 * 60_000,
-  "365": 30 * 60_000,
-};
+const TTL_NOW = 60_000; // 1 minute
+const TTL_TODAY = 5 * 60_000; // 5 minutes
+
+// 30 and 365 will refresh at 12:00 PH/SG
+function getNextMiddayTTL(): number {
+  const now = new Date();
+  const nextMidday = new Date(now);
+  nextMidday.setHours(12, 0, 0, 0);
+  if (now >= nextMidday) {
+    nextMidday.setDate(nextMidday.getDate() + 1);
+  }
+  return nextMidday.getTime() - now.getTime();
+}
 
 const cache: CacheEntry = { data: {}, timestamps: {} };
 
-// ---------- Remote JSON cache ----------
-const JSON_TTL = 10 * 60_000;
-const jsonCache: Record<string, { data: unknown; fetchedAt: number }> = {};
-
-async function fetchJSON(
-  doc: "brand-properties" | "brand-ga4-properties",
-  bypassCache: boolean,
-): Promise<unknown> {
-  const now = Date.now();
-  if (
-    !bypassCache &&
-    jsonCache[doc] &&
-    now - jsonCache[doc].fetchedAt < JSON_TTL
-  ) {
-    return jsonCache[doc].data;
-  }
-
-  const url = `https://realtime-ga4-rho.vercel.app/api/json-provider/dashboard-config/${doc}${bypassCache ? "?cache=false" : ""}`;
-
-  try {
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) throw new Error(res.statusText);
-
-    const json = await res.json();
-    const data = (json as { data?: unknown }).data ?? json;
-    if (!bypassCache) jsonCache[doc] = { data, fetchedAt: now };
-    return data;
-  } catch {
-    return doc === "brand-properties"
-      ? BRAND_PROPERTIES_RAW
-      : GA4_PROPERTIES_RAW;
-  }
-}
-
 // ---------------- Helpers ----------------
-function isFresh(key: string): boolean {
-  return (
-    Date.now() - (cache.timestamps[key] ?? 0) <
-    TTL[key.split(":")[1] as keyof typeof TTL]
-  );
+function isFresh(key: string, ttl: number): boolean {
+  return Date.now() - (cache.timestamps[key] ?? 0) < ttl;
 }
 
-// Build GA4 dimensionFilter if filter exists
 function buildGA4Filter(filter?: GA4Filter): GA4FilterExpression | undefined {
   if (!filter) return undefined;
   return {
@@ -130,13 +98,14 @@ async function fetchGA4(
       range === "today"
         ? [{ startDate: "today", endDate: "today" }]
         : range === "30"
-          ? [{ startDate: "30daysAgo", endDate: "today" }]
-          : [{ startDate: "365daysAgo", endDate: "today" }],
+          ? [{ startDate: "30daysAgo", endDate: "yesterday" }] // exclude today
+          : [{ startDate: "365daysAgo", endDate: "yesterday" }], // exclude today
     metrics: [{ name: "activeUsers" }],
     dimensionFilter: buildGA4Filter(BRAND_PROPERTIES[brand]?.ga4_filter),
   };
 
   const [response] = await client.runReport(request);
+  console.log(`[GA4 Fetch] ${brand} (${range}): fetched from GA4`);
   return Number(response.rows?.[0]?.metricValues?.[0]?.value ?? 0);
 }
 
@@ -147,17 +116,20 @@ async function fetchRealtime(
   todayValue: number,
 ): Promise<number> {
   if (BRAND_PROPERTIES[brand]?.ga4_filter) {
-    // For filtered brands, estimate realtime as today / 48
-    return Math.max(1, Math.round(todayValue / 48));
+    const val = Math.max(1, Math.round(todayValue / 48));
+    console.log(`[GA4 Realtime] ${brand}: estimated ${val}`);
+    return val;
   } else {
     const [res] = await client.runRealtimeReport({
       property: `properties/${GA4_PROPS[brand]}`,
       metrics: [{ name: "activeUsers" }],
     });
-    return Number(
+    const val = Number(
       res.rows?.[0]?.metricValues?.[0]?.value ??
         Math.max(1, Math.round(todayValue / 48)),
     );
+    console.log(`[GA4 Realtime] ${brand}: fetched ${val}`);
+    return val;
   }
 }
 
@@ -166,16 +138,11 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const bypassCache = url.searchParams.get("cache") === "false";
 
-  BRAND_PROPERTIES = (await fetchJSON(
-    "brand-properties",
-    bypassCache,
-  )) as Record<string, BrandProperty>;
-  GA4_PROPS = (await fetchJSON("brand-ga4-properties", bypassCache)) as Record<
-    string,
-    string
-  >;
-
-  if (bypassCache) cache.timestamps = {};
+  if (bypassCache) {
+    console.log(`[Cache] Clearing all metric cache`);
+    cache.data = {};
+    cache.timestamps = {};
+  }
 
   const client = new BetaAnalyticsDataClient({
     credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON as string),
@@ -188,31 +155,41 @@ export async function GET(req: Request) {
       cache.data[brand] ??= { now: 0, today: 0, "30": 0, "365": 0 };
 
       // ---- TODAY ----
-      if (!isFresh(`${brand}:today`)) {
+      if (!isFresh(`${brand}:today`, TTL_TODAY)) {
         cache.data[brand].today = await fetchGA4(client, brand, "today");
         cache.timestamps[`${brand}:today`] = Date.now();
+      } else {
+        console.log(`[Cache] ${brand}:today served from cache`);
       }
 
       // ---- 30 DAYS ----
-      if (!isFresh(`${brand}:30`)) {
+      const ttl30 = getNextMiddayTTL();
+      if (!isFresh(`${brand}:30`, ttl30)) {
         cache.data[brand]["30"] = await fetchGA4(client, brand, "30");
         cache.timestamps[`${brand}:30`] = Date.now();
+      } else {
+        console.log(`[Cache] ${brand}:30 served from cache`);
       }
 
       // ---- 365 DAYS ----
-      if (!isFresh(`${brand}:365`)) {
+      const ttl365 = getNextMiddayTTL();
+      if (!isFresh(`${brand}:365`, ttl365)) {
         cache.data[brand]["365"] = await fetchGA4(client, brand, "365");
         cache.timestamps[`${brand}:365`] = Date.now();
+      } else {
+        console.log(`[Cache] ${brand}:365 served from cache`);
       }
 
       // ---- REALTIME ----
-      if (!isFresh(`${brand}:now`)) {
+      if (!isFresh(`${brand}:now`, TTL_NOW)) {
         cache.data[brand].now = await fetchRealtime(
           client,
           brand,
           cache.data[brand].today,
         );
         cache.timestamps[`${brand}:now`] = Date.now();
+      } else {
+        console.log(`[Cache] ${brand}:now served from cache`);
       }
     }),
   );
