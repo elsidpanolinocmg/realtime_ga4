@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import BRAND_PROPERTIES_RAW from "@/data/brand_properties.json";
 import GROUPS_RAW from "@/data/groups.json";
+import Image from "next/image";
 
 type BrandStats = {
   now: number | null;
@@ -19,7 +20,6 @@ type BrandRow = {
 
 interface BrandInfo {
   name: string;
-  ga4_filter?: any;
   group?: string;
   image?: string;
 }
@@ -42,13 +42,22 @@ const DEFAULT_IMAGE = "logo/cmg.png"; // fallback image
 // -------------------- Helpers --------------------
 
 // Sorting parameters
-function getSortParams(): { sortBy: keyof BrandStats | "name"; sortAsc: boolean } {
+function getSortParams(): {
+  sortBy: keyof BrandStats | "name";
+  sortAsc: boolean;
+} {
   if (typeof window === "undefined") return { sortBy: "365", sortAsc: false };
   const params = new URLSearchParams(window.location.search);
   const rawSort = params.get("sort");
   const order = (params.get("order") ?? "desc").toLowerCase();
-  const isStatKey = rawSort !== null && ["now", "today", "30", "365"].includes(rawSort);
-  const sortBy: keyof BrandStats | "name" = rawSort === "name" ? "name" : isStatKey ? (rawSort as keyof BrandStats) : "365";
+  const isStatKey =
+    rawSort !== null && ["now", "today", "30", "365"].includes(rawSort);
+  const sortBy: keyof BrandStats | "name" =
+    rawSort === "name"
+      ? "name"
+      : isStatKey
+        ? (rawSort as keyof BrandStats)
+        : "365";
   return { sortBy, sortAsc: order === "asc" };
 }
 
@@ -74,7 +83,12 @@ function getBrandName(brandCode: string, grouped = false): string {
   if (!grouped) return brand?.name ?? brandCode.toUpperCase();
 
   const groupKey = brand?.group;
-  if (groupKey) return GROUPS[groupKey]?.name ?? BRAND_PROPERTIES[getBrandMain(brandCode)]?.name ?? brandCode.toUpperCase();
+  if (groupKey)
+    return (
+      GROUPS[groupKey]?.name ??
+      BRAND_PROPERTIES[getBrandMain(brandCode)]?.name ??
+      brandCode.toUpperCase()
+    );
   return brand?.name ?? brandCode.toUpperCase();
 }
 
@@ -103,7 +117,9 @@ export default function AllStatsPage() {
 
   async function fetchAllStats() {
     try {
-      const res = await fetch(`${API_BASE}/api/all/active`, { cache: "no-store" });
+      const res = await fetch(`${API_BASE}/api/all/active`, {
+        cache: "no-store",
+      });
       if (!res.ok) return;
 
       const data = await res.json();
@@ -188,10 +204,12 @@ export default function AllStatsPage() {
       acc["365"] = (acc["365"] ?? 0) + (row.stats["365"] ?? 0);
       return acc;
     },
-    { now: 0, today: 0, "30": 0, "365": 0 }
+    { now: 0, today: 0, "30": 0, "365": 0 },
   );
 
-  const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+  const params = new URLSearchParams(
+    typeof window !== "undefined" ? window.location.search : "",
+  );
   const grouped = params.get("grouped") === "true";
 
   // -------------------- Sorting --------------------
@@ -219,10 +237,19 @@ export default function AllStatsPage() {
           <p className="text-3xl font-bold m-4 capitalize">Websites Users</p>
 
           <div className="flex flex-wrap justify-between w-full px-8 gap-4">
-            <Metric label="Active Users for Last 365 Days" value={totals["365"]} />
-            <Metric label="Active Users for Last 30 Days" value={totals["30"]} />
+            <Metric
+              label="Active Users for Last 365 Days"
+              value={totals["365"]}
+            />
+            <Metric
+              label="Active Users for Last 30 Days"
+              value={totals["30"]}
+            />
             <Metric label="Active Users Today" value={totals.today} />
-            <Metric label="Active Users for Last 30 Minutes" value={totals.now} />
+            <Metric
+              label="Active Users for Last 30 Minutes"
+              value={totals.now}
+            />
           </div>
 
           {tableMode ? (
@@ -243,13 +270,29 @@ export default function AllStatsPage() {
                   return (
                     <tr key={row.brand}>
                       <td style={td} className="flex items-center gap-2">
-                        <div className="w-30"><img src={img} alt="" className="w-full h-7 drop-shadow-md object-contain px-2" /></div>
+                        <div className="w-30 relative h-7">
+                          <Image
+                            src={`/${img}`}
+                            alt={displayName}
+                            fill
+                            style={{ objectFit: "contain" }}
+                            className="drop-shadow-md"
+                          />
+                        </div>
                         {displayName}
                       </td>
-                      <td style={td}>{row.stats["365"]?.toLocaleString() ?? "—"}</td>
-                      <td style={td}>{row.stats["30"]?.toLocaleString() ?? "—"}</td>
-                      <td style={td}>{row.stats.today?.toLocaleString() ?? "—"}</td>
-                      <td style={td}>{row.stats.now?.toLocaleString() ?? "—"}</td>
+                      <td style={td}>
+                        {row.stats["365"]?.toLocaleString() ?? "—"}
+                      </td>
+                      <td style={td}>
+                        {row.stats["30"]?.toLocaleString() ?? "—"}
+                      </td>
+                      <td style={td}>
+                        {row.stats.today?.toLocaleString() ?? "—"}
+                      </td>
+                      <td style={td}>
+                        {row.stats.now?.toLocaleString() ?? "—"}
+                      </td>
                     </tr>
                   );
                 })}
@@ -263,16 +306,48 @@ export default function AllStatsPage() {
                 return (
                   <div
                     key={row.brand}
-                    className="p-2 border text-gray-600 max-w-l w-full flex flex-col border-gray-400 rounded shadow-sm bg-gray-50"
+                    className="p-2 border text-gray-600 max-w-l w-full flex flex-row border-gray-400 rounded shadow-sm bg-gray-50"
                   >
-                    <div className="flex items-center gap-2 font-bold text-lg mb-2 text-gray-800">
-                      <img src={img} alt="" className="w-10 h-10 object-contain shadow-sm" />
-                      {displayName}
+                    <div className="content-center">
+                      <div className="relative w-20 h-20 m-2">
+                        <Image
+                          src={`/${img}`}
+                          alt={displayName}
+                          fill
+                          style={{ objectFit: "contain" }}
+                          className="shadow-sm"
+                        />
+                      </div>
                     </div>
-                    <div>Now: <span className="font-bold text-gray-800">{row.stats.now?.toLocaleString() ?? "—"}</span></div>
-                    <div>Today: <span className="font-bold text-gray-800">{row.stats.today?.toLocaleString() ?? "—"}</span></div>
-                    <div>Last 30 Days: <span className="font-bold text-gray-800">{row.stats["30"]?.toLocaleString() ?? "—"}</span></div>
-                    <div>Last 365 Days: <span className="font-bold text-gray-800">{row.stats["365"]?.toLocaleString() ?? "—"}</span></div>
+                    <div>
+                      <div className="flex items-center gap-2 font-bold text-lg mb-2 text-gray-800">
+                        {displayName}
+                      </div>
+                      <div className="text-right">
+                        Now:{" "}
+                        <span className="font-bold text-gray-800">
+                          {row.stats.now?.toLocaleString() ?? "—"}
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        Today:{" "}
+                        <span className="font-bold text-gray-800">
+                          {row.stats.today?.toLocaleString() ?? "—"}
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        Last 30 Days:{" "}
+                        <span className="font-bold text-gray-800">
+                          {row.stats["30"]?.toLocaleString() ?? "—"}
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        Last 365 Days:{" "}
+                        <span className="font-bold text-gray-800">
+                          {row.stats["365"]?.toLocaleString() ?? "—"}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 );
               })}
