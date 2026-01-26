@@ -17,6 +17,7 @@ interface CacheEntry {
 interface BrandProperty {
   name: string;
   ga4_filter?: any;
+  hide?: boolean;
 }
 
 // ---------------- Constants ----------------
@@ -102,12 +103,14 @@ export async function GET(req: Request) {
   BRAND_PROPERTIES = await fetchJSON("brand-properties", bypassCache);
   GA4_PROPS = await fetchJSON("brand-ga4-properties", bypassCache);
 
-    if (bypassCache) {
+  if (bypassCache) {
     cache.timestamps = {};
   }
 
   const client = getGAClient();
-  const brands = Object.keys(BRAND_PROPERTIES);
+  const brands = Object.keys(BRAND_PROPERTIES).filter(
+    (brand) => !BRAND_PROPERTIES[brand]?.hide
+  );
 
   await Promise.all(
     brands.map(async (brand) => {
