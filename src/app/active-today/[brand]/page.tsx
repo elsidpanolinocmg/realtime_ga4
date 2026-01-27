@@ -1,6 +1,6 @@
 // app/active-today/[brand]/page.tsx
 import React from "react";
-import OdometerToday from "@/src/components/OdometerToday";
+import OdometerLast from "@/src/components/OdometerDaily";
 
 interface SearchParams {
   fontSize?: string;
@@ -23,7 +23,7 @@ const RealtimeActiveBrand = async ({ params, searchParams }: Props) => {
   const fontSize = sp.fontSize || "3rem";
   const bold = sp.bold === "true";
   const color = sp.color || "#010101";
-  const backgroundColor = sp.backgroundColor || "#ffffff00";
+  const backgroundColor = sp.backgroundColor || "#ffffff";
   const intervalms = sp.intervalms
     ? Number(sp.intervalms): 600000;
 
@@ -32,13 +32,13 @@ const RealtimeActiveBrand = async ({ params, searchParams }: Props) => {
       style={{ backgroundColor }}
       className="bg-transparent min-h-screen flex items-center justify-center"
     >
-      <OdometerToday
+      <OdometerLast
         fetchUrl={`/api/active-today/${brand}`}
+        field="activeToday"
         fontSize={fontSize}
         bold={bold}
         color={color}
         backgroundColor={backgroundColor}
-        intervalms={intervalms}
       />
     </div>
   );

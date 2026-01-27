@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 interface OdometerProps {
   fetchUrl?: string;
+  field?: string;
   fontSize?: string;
   bold?: boolean;
   color?: string;
@@ -12,8 +13,9 @@ interface OdometerProps {
   intervalms?: number;
 }
 
-const OdometerToday = ({
+const OdometerLast = ({
   fetchUrl = "/api/active-today",
+  field = "activeToday",
   fontSize = "3rem",
   bold = false,
   color = "#010101",
@@ -24,15 +26,16 @@ const OdometerToday = ({
   const [displayValue, setDisplayValue] = useState(0);
   const [initialFetched, setInitialFetched] = useState(false);
 
+  // Fetch latest value
   useEffect(() => {
     const fetchValue = async () => {
       const res = await fetch(`${fetchUrl}?intervalms=${intervalms}`);
       const data = await res.json();
 
-      if (typeof data.activeToday === "number") {
-        setTargetValue(data.activeToday);
+      if (typeof data[field] === "number") {
+        setTargetValue(data[field]);
         if (!initialFetched) {
-          setDisplayValue(data.activeToday);
+          setDisplayValue(data[field]); // Set without animation
           setInitialFetched(true);
         }
       }
@@ -41,8 +44,9 @@ const OdometerToday = ({
     fetchValue();
     const timer = setInterval(fetchValue, intervalms);
     return () => clearInterval(timer);
-  }, [fetchUrl, intervalms, initialFetched]);
+  }, [fetchUrl, intervalms, initialFetched, field]);
 
+  // Animate only after initial fetch
   useEffect(() => {
     if (!initialFetched || displayValue === targetValue) return;
 
@@ -54,9 +58,7 @@ const OdometerToday = ({
     return () => clearInterval(timer);
   }, [displayValue, targetValue, initialFetched]);
 
-  const padded = displayValue
-    .toString()
-    .padStart(targetValue.toString().length, "0");
+  const formattedValue = displayValue.toLocaleString();
 
   return (
     <div
@@ -69,12 +71,12 @@ const OdometerToday = ({
         lineHeight: 1,
       }}
     >
-      {padded.split("").map((digit, i) => (
+      {formattedValue.split("").map((char, i) => (
         <span
           key={i}
           style={{
             position: "relative",
-            width: "1ch",
+            width: char === "," ? "0.5ch" : "1ch",
             height: fontSize,
             overflow: "hidden",
             display: "inline-block",
@@ -82,13 +84,13 @@ const OdometerToday = ({
         >
           <AnimatePresence initial={false}>
             <motion.span
-              key={digit + i}
-              initial={{ y: "100%", opacity: 0 }}
+              key={char + i}
+              initial={initialFetched ? { y: "100%", opacity: 0 } : false} // <--- don't animate first time
               animate={{ y: "0%", opacity: 1 }}
               exit={{ y: "-100%", opacity: 0 }}
               transition={{ duration: 0.15 }}
             >
-              {digit}
+              {char}
             </motion.span>
           </AnimatePresence>
         </span>
@@ -97,4 +99,4 @@ const OdometerToday = ({
   );
 };
 
-export default OdometerToday;
+export default OdometerLast;
