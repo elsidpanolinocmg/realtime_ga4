@@ -17,7 +17,6 @@ interface BrandDashboardProps {
   cardduration?: number;
   activeNowIntervalms?: number;
   activeTodayIntervalms?: number;
-  themeColor?: boolean;
 }
 
 export default function BrandDashboard({
@@ -27,7 +26,6 @@ export default function BrandDashboard({
   cardduration = 4000,
   activeNowIntervalms = 10000,
   activeTodayIntervalms = 60000,
-  themeColor = true,
 }: BrandDashboardProps) {
   const safeReplace = (url: string) => (url ? url.replace(/\/$/, "") : "");
 
@@ -177,13 +175,11 @@ export default function BrandDashboard({
           feedUrl={exclusiveFeedUrl}
           duration={cardduration}
           labelColor="#ff0000"
-          backgroundColor={themeColor ? siteConfig?.color : "#f5f5f5"}
         />
 
         <TickerStrip
           feedUrl={feedUrl}
           speed={stripspeed}
-          backgroundColor={themeColor ? siteConfig?.color : undefined}
         />
       </footer>
     </div>
