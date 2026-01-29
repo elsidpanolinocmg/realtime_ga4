@@ -191,7 +191,6 @@ export default function EditorialPage() {
           cardduration={cardduration}
           activeNowIntervalms={activeNowIntervalms}
           activeTodayIntervalms={activeTodayIntervalms}
-
         />
       </div>
 

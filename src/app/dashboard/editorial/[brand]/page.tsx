@@ -12,7 +12,7 @@ export default async function BrandPage({ params, searchParams }: BrandPageProps
   // ✅ unwrap searchParams safely
   const sp = (await searchParams) ?? {};
 
-  const speed = Number(sp.speed ?? 100);
+  const stripspeed = Number(sp.stripspeed ?? 100);
   const themeColor = sp["theme-color"] === "true" || sp["theme-color"] === "1";
 
   const baseUrl =
@@ -32,8 +32,7 @@ export default async function BrandPage({ params, searchParams }: BrandPageProps
     <BrandDashboard
       brand={brand}
       siteConfig={siteConfig}
-      speed={speed}
-      themeColor={themeColor}
+      stripspeed={stripspeed}
     />
   );
 }
