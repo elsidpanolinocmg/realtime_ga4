@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useSearchParams, useRouter } from "next/navigation";
+import { EDITORIAL_DEFAULTS} from "./default";
 
 const BrandDashboard = dynamic(() => import("@/src/components/BrandDashboard"), { ssr: false });
 

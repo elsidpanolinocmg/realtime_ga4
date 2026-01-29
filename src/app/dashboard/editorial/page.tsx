@@ -1,9 +1,11 @@
-import React from 'react'
+import { Suspense } from "react";
 import EditorialPageClient from './EditorialClient'
 
 const EditorialPage = () => {
   return (
-     <EditorialPageClient />
+    <Suspense fallback={<div>Loading…</div>}>
+      <EditorialPageClient />
+    </Suspense>
   )
 }
 
