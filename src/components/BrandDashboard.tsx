@@ -93,44 +93,44 @@ export default function BrandDashboard({
         </div>
 
         {/* Metrics */}
-        <div
-          className=" flex flex-nowrap md:flex-wrap overflow-x-auto md:overflow-visible justify-start md:justify-evenly gap-2 md:gap-4 flex-1 text-gray-900 scrollbar-hide">          {[
-          {
-            label: "Active Users Last 365 Days",
-            url: `/api/active-365-days/${brand}`,
-            field: "activeLast365Days",
-            type: "daily",
-          },
-          {
-            label: "Active Users Last 30 Days",
-            url: `/api/active-30-days/${brand}`,
-            field: "activeLast30Days",
-            type: "daily",
-          },
-          {
-            label: "Active Users Today",
-            url: `/api/active-today/${brand}`,
-            field: "activeToday",
-            type: "last",
-            intervalms: activeTodayIntervalms,
-          },
-          {
-            label: "Active Users Now",
-            url: `/api/active-now/${brand}`,
-            field: "activeUsers",
-            type: "last",
-            intervalms: activeNowIntervalms,
-          },
-        ].map((m) => (
-          <div key={m.label} className="flex flex-col items-center text-center flex-shrink-0">
-            <p className="text-xs md:text-sm">{m.label}</p>
-            {m.type === "daily" ? (
-              <OdometerDaily fetchUrl={m.url} field={m.field} />
-            ) : (
-              <OdometerLast fetchUrl={m.url} field={m.field} intervalms={m.intervalms} />
-            )}
-          </div>
-        ))}
+        <div className="grid grid-cols-2 gap-2 md:flex md:flex-nowrap md:justify-evenly md:gap-4 flex-1 text-gray-900">
+          {[
+            {
+              label: "Active Users Last 365 Days",
+              url: `/api/active-365-days/${brand}`,
+              field: "activeLast365Days",
+              type: "daily",
+            },
+            {
+              label: "Active Users Last 30 Days",
+              url: `/api/active-30-days/${brand}`,
+              field: "activeLast30Days",
+              type: "daily",
+            },
+            {
+              label: "Active Users Today",
+              url: `/api/active-today/${brand}`,
+              field: "activeToday",
+              type: "last",
+              intervalms: activeTodayIntervalms,
+            },
+            {
+              label: "Active Users Now",
+              url: `/api/active-now/${brand}`,
+              field: "activeUsers",
+              type: "last",
+              intervalms: activeNowIntervalms,
+            },
+          ].map((m) => (
+            <div key={m.label} className="flex flex-col items-center text-center flex-shrink-0">
+              <p className="text-xs md:text-sm">{m.label}</p>
+              {m.type === "daily" ? (
+                <OdometerDaily fetchUrl={m.url} field={m.field} />
+              ) : (
+                <OdometerLast fetchUrl={m.url} field={m.field} intervalms={m.intervalms} />
+              )}
+            </div>
+          ))}
         </div>
 
         {/* CMG fullscreen toggle */}
@@ -178,7 +178,7 @@ export default function BrandDashboard({
 
       {/* ================= TICKERS ================= */}
       <footer className="shrink-0">
-        <div className="flex flex-row md:flex-col md:space-y-0 gap-0">
+        <div className="flex flex-col md:space-y-0 gap-0">
           <div className="flex-1 min-w-0">
             <TickerCard
               feedUrl={exclusiveFeedUrl}
