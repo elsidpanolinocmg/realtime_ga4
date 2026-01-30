@@ -138,16 +138,18 @@ const styles = {
   ticker: {
     display: "flex",
     alignItems: "center",
+    flexGrow: 1,       // allow ticker to grow
+    flexShrink: 1,     // allow ticker to shrink if needed
+    flexBasis: 0,      // allows equal split in horizontal row
     overflow: "hidden",
-    whiteSpace: "nowrap" as const,
-    width: "100%",
     fontSize: "clamp(1.25rem, 1.5vw, 1.75rem)",
     height: "50px",
     fontFamily: '"DIN-Bold", Arial, sans-serif',
     backgroundColor: "#FF0000",
+    minWidth: 0,       // crucial: prevent content from forcing extra width
   },
   label: {
-    width: "175px",
+    width: "100px",
     fontWeight: "bold" as const,
     display: "flex",
     alignItems: "center",
@@ -157,22 +159,27 @@ const styles = {
     flexShrink: 0,
     textShadow: "0 0 5px rgba(0,0,0,0.5)",
     color: "white",
+    fontSize: "clamp(12px, 1.2vw, 16px)",
   },
   scroll: {
     flex: 1,
     overflow: "hidden",
     display: "flex",
     alignItems: "center",
+    position: "relative" as const,
+    height: "100%",
+    minWidth: 0, // important to allow flex shrinking
   },
   headlines: {
-    whiteSpace: "nowrap" as const,
     display: "inline-block",
     fontWeight: "bold" as const,
+    fontSize: "clamp(12px, 1.2vw, 24px)",
+    whiteSpace: "nowrap" as const,
     backgroundColor: "#FF0000",
   },
   item: {
-    margin: "0 200px",
     display: "inline-block",
+    marginRight: "200px",
     color: "white",
   },
 };

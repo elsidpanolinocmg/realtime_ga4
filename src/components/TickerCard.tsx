@@ -95,7 +95,7 @@ export default function TickerCard({
         `}
             </style>
             <div style={{ ...styles.label, backgroundColor: labelColor }}>{label}</div>
-            <div style={{ ...styles.scroll, backgroundColor:"#F2F2F2" }}>
+            <div style={{ ...styles.scroll, backgroundColor: "#F2F2F2" }}>
                 {headlines.map((h, i) => (
                     <div
                         key={i}
@@ -114,45 +114,52 @@ export default function TickerCard({
 }
 
 const styles = {
-    ticker: {
-        display: "flex",
-        alignItems: "center",
-        width: "100%",
-        fontSize: "clamp(1.25rem, 1.5vw, 1.75rem)",
-        color: "black",
-        height: "50px",
-        fontFamily: '"DIN-Bold", Arial, sans-serif',
-        overflow: "hidden",
-    },
-    label: {
-        width: "175px",
-        fontWeight: 700,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        textTransform: "uppercase" as const,
-        color: "white",
-        height: "100%",
-        flexShrink: 0,
-    },
-    scroll: {
-        flex: 1,
-        position: "relative" as const,
-        overflow: "hidden",
-        height: "100%", // make container fill ticker height
-    },
-    headline: {
-        position: "absolute" as const,
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%", // fill container
-        display: "flex",
-        alignItems: "center", // vertically center text
-        paddingLeft: "10px",
-        fontWeight: 700,
-        textTransform: "uppercase" as const,
-        fontSize: "24px",
-        lineHeight: 1.2,
-        transition: "transform 0.6s ease, opacity 0.6s ease",    },
+  ticker: {
+    display: "flex",
+    alignItems: "center",
+    fontSize: "clamp(1.25rem, 1.5vw, 1.75rem)",
+    color: "black",
+    height: "50px",
+    fontFamily: '"DIN-Bold", Arial, sans-serif',
+    overflow: "hidden",
+    width: "100%",      // make sure it fills parent
+    minWidth: 0,        // prevents flex shrink issues
+  },
+  label: {
+    width: "100px",
+    fontWeight: 700,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    textTransform: "uppercase" as const,
+    color: "white",
+    height: "100%",
+    flexShrink: 0,
+    fontSize: "clamp(12px, 1.2vw, 16px)",
+  },
+  scroll: {
+    flex: 1,
+    position: "relative" as const,
+    overflow: "hidden",
+    display: "flex",
+    alignItems: "center",
+    minHeight: "50px", // ensures scroll container doesn't collapse
+  },
+  headline: {
+    position: "absolute" as const,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,          // instead of height: 100%
+    display: "flex",
+    alignItems: "center",
+    paddingLeft: "10px",
+    fontWeight: 700,
+    textTransform: "uppercase" as const,
+    fontSize: "clamp(12px, 1.2vw, 24px)",
+    lineHeight: 1.2,
+    transition: "transform 0.6s ease, opacity 0.6s ease",
+    backgroundColor: "#ffffff",
+    color: "#000",
+  },
 };

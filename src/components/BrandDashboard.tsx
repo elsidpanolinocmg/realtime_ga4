@@ -178,16 +178,20 @@ export default function BrandDashboard({
 
       {/* ================= TICKERS ================= */}
       <footer className="shrink-0">
-        <TickerCard
-          feedUrl={exclusiveFeedUrl}
-          duration={cardduration}
-          labelColor="#ff0000"
-        />
-
-        <TickerStrip
-          feedUrl={feedUrl}
-          speed={stripspeed}
-        />
+        <div className="flex flex-row md:flex-col md:space-y-0 gap-0">
+          <div className="flex-1 min-w-0">
+            <TickerCard
+              feedUrl={exclusiveFeedUrl}
+              duration={cardduration}
+            />
+          </div>
+          <div className="flex-1 min-w-0">
+            <TickerStrip
+              feedUrl={feedUrl}
+              speed={stripspeed}
+            />
+          </div>
+        </div>
       </footer>
     </div>
   );
