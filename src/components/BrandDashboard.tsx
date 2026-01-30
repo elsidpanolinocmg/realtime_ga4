@@ -152,7 +152,7 @@ export default function BrandDashboard({
       </header>
 
       {/* ================= MAIN CONTENT ================= */}
-      <main className="flex-1 flex flex-col md:flex-row items-center justify-center overflow-y-visible md:overflow-y-visible px-3 md:px-8 py-4 md:py-4 gap-8 md:gap-8">
+      <main className="flex-1 flex flex-col md:flex-row items-center justify-center overflow-y-visible md:overflow-y-visible px-3 md:px-8 py-4 md:py-4 gap-8 md:gap-8 pb-[100px]">
         <div className="w-full max-w-[1920px] flex flex-col justify-center md:flex-row gap-8 md:gap-8 px-3 md:px-8">
           {showTopViews && (
             <div className="w-full md:w-[40%] flex flex-col overflow-hidden">
@@ -177,7 +177,7 @@ export default function BrandDashboard({
       </main>
 
       {/* ================= TICKERS ================= */}
-      <footer className="shrink-0 w-full">
+      <footer className="fixed bottom-0 left-0 z-50 w-full">
         <div className="flex flex-col w-full gap-0">
           <div className="w-full">
             <TickerCard
