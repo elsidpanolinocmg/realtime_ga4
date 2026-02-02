@@ -191,3 +191,37 @@ export async function GET(
     );
   }
 }
+
+
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: Promise<{ collection?: string; document?: string }> }
+) {
+  try {
+    const { collection, document } = await params;
+
+    if (!collection || !document) {
+      return NextResponse.json(
+        { error: "Collection and document are required" },
+        { status: 400 }
+      );
+    }
+
+    const body = await req.json();
+
+    const col = await getCollection(collection);
+
+    await col.updateOne(
+      { uid: document },
+      { $set: { data: body } },
+      { upsert: true }
+    );
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    return NextResponse.json(
+      { error: "Update failed", message: (err as Error).message },
+      { status: 500 }
+    );
+  }
+}
