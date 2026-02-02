@@ -152,10 +152,11 @@ export default function BrandDashboard({
       </header>
 
       {/* ================= MAIN CONTENT ================= */}
-      <main className="flex-1 flex flex-col md:flex-row items-center justify-center overflow-y-visible md:overflow-y-visible px-3 md:px-8 py-4 md:py-4 gap-8 md:gap-8 pb-[100px]">
-        <div className="w-full max-w-[1920px] flex flex-col justify-center items-center md:flex-row gap-8 md:gap-8 px-3 md:px-8">
+      <main className="flex-1 flex flex-col md:flex-row items-stretch justify-center px-3 md:px-8 py-4 gap-8 pb-[100px]">
+        <div className="w-full max-w-[1920px] flex flex-col md:flex-row gap-8 px-3 md:px-8">
+
           {showTopViews && (
-            <div className="w-full md:w-[40%] flex flex-col overflow-hidden">
+            <div className="w-full md:w-[40%] flex flex-col h-full overflow-hidden">
               <TopViews
                 xmlUrl={articlesFeedUrl}
                 limit={10}
@@ -173,6 +174,7 @@ export default function BrandDashboard({
               />
             </div>
           )}
+
         </div>
       </main>
 
