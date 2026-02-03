@@ -1,9 +1,12 @@
-import React from 'react'
+import AwardsGridClient from "./AwardsGridClient";
+import { getAwards, Award } from "@/lib/GetAwards";
 
-const AwardsPage = () => {
+export default async function AwardsPage() {
+  const awards: Award[] = await getAwards();
+
   return (
-    <div>AwardsPage</div>
-  )
+    <div className="h-screen w-screen overflow-auto bg-white text-gray-900">
+      <AwardsGridClient awards={awards} />
+    </div>
+  );
 }
-
-export default AwardsPage
