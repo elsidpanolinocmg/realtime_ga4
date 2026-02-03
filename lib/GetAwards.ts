@@ -1,7 +1,6 @@
 import * as cheerio from "cheerio";
 
-const BASE_URL =
-  process.env.JSON_PROVIDER_URL || process.env.NEXT_PUBLIC_SITE_URL;
+const BASE_URL = process.env.JSON_PROVIDER_URL || process.env.NEXT_PUBLIC_SITE_URL;
 
 /* ---------------- TYPES ---------------- */
 
@@ -24,9 +23,9 @@ export interface Award {
 
 /* ---------------- HELPERS ---------------- */
 
+// Normalize title for deduplication and image matching
 function normalizeTitle(str?: string) {
   if (!str) return "";
-
   return str
     .replace(/&amp;/gi, "&")
     .replace(/&/g, "and")
@@ -35,44 +34,47 @@ function normalizeTitle(str?: string) {
     .toLowerCase();
 }
 
+// Choose best image from srcset
 function getBestSrcFromSrcset(srcset?: string) {
   if (!srcset) return undefined;
-  return srcset.split(",").map(s => s.trim().split(" ")[0]).pop();
+  return srcset.split(",").map((s) => s.trim().split(" ")[0]).pop();
+}
+
+// Safe fetch with User-Agent to avoid 401
+async function safeFetch(url: string) {
+  return fetch(url, {
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
+      Accept: "application/json",
+    },
+    cache: "no-store",
+  });
 }
 
 /* ---------------- GET BRANDS ---------------- */
 
 export async function getAwardBrands(): Promise<Brand[]> {
-  const res = await fetch(
-    `${BASE_URL}/api/json-provider/dashboard-config/brand-all-properties`,
-    { next: { revalidate: 300 } }
-  );
-  console.log("Response status:", res.status);
-
+  const res = await safeFetch(`${BASE_URL}/api/json-provider/dashboard-config/brand-all-properties`);
+  console.log("Brand fetch status:", res.status);
   const config = await res.json();
 
   return Object.entries(config)
     .filter(([, site]: any) => site?.awards && site?.url)
-    .map(([brand, site]: any) => ({
-      brand,
-      ...site
-    }));
+    .map(([brand, site]: any) => ({ brand, ...site }));
 }
 
 /* ---------------- FETCH IMAGE MAP ---------------- */
 
 async function fetchAwardImagesMap(siteUrl: string) {
   try {
-    const html = await fetch(`${siteUrl}/awards`, {
-      next: { revalidate: 300 }
-    }).then(r => r.text());
-
+    const html = await safeFetch(`${siteUrl}/awards`).then((r) => r.text());
     const $ = cheerio.load(html);
     const map: Record<string, string> = {};
 
-    /* ---- Standard Awards ---- */
+    // Standard awards
     $(".view-content .item.with-border-bottom").each((_, el) => {
-      const title = $(el).find(".item__title a").text().trim();
+      const title = $(el).find(".item__title a").text()?.trim();
       if (!title) return;
 
       let img =
@@ -81,21 +83,13 @@ async function fetchAwardImagesMap(siteUrl: string) {
         $(el).find("img").attr("data-src") ||
         $(el).find("img").attr("src");
 
-      if (img && !img.startsWith("http")) {
-        img = new URL(img, siteUrl).href;
-      }
-
-      if (img) {
-        map[normalizeTitle(title)] = img;
-      }
+      if (img && !img.startsWith("http")) img = new URL(img, siteUrl).href;
+      if (img) map[normalizeTitle(title)] = img;
     });
 
-    /* ---- Elementor fallback ---- */
+    // Elementor fallback
     $(".elementor-widget-image").each((_, el) => {
-      const title =
-        $(el).find("a").attr("title") ||
-        $(el).find("a").text();
-
+      const title = $(el).find("a").attr("title")?.trim() || $(el).find("a").text()?.trim();
       if (!title) return;
 
       let img =
@@ -103,13 +97,8 @@ async function fetchAwardImagesMap(siteUrl: string) {
         $(el).find("img").attr("data-src") ||
         $(el).find("img").attr("src");
 
-      if (img && !img.startsWith("http")) {
-        img = new URL(img, siteUrl).href;
-      }
-
-      if (img) {
-        map[normalizeTitle(title)] = img;
-      }
+      if (img && !img.startsWith("http")) img = new URL(img, siteUrl).href;
+      if (img) map[normalizeTitle(title)] = img;
     });
 
     return map;
@@ -122,10 +111,7 @@ async function fetchAwardImagesMap(siteUrl: string) {
 
 async function fetchNominationDates(viewNode: string) {
   try {
-    const html = await fetch(viewNode, {
-      next: { revalidate: 300 }
-    }).then(r => r.text());
-
+    const html = await safeFetch(viewNode).then((r) => r.text());
     const $ = cheerio.load(html);
 
     const start = $(".nomination-date .start-date").attr("date");
@@ -133,7 +119,7 @@ async function fetchNominationDates(viewNode: string) {
 
     return {
       startDate: start ? new Date(start).toISOString() : null,
-      endDate: end ? new Date(end).toISOString() : null
+      endDate: end ? new Date(end).toISOString() : null,
     };
   } catch {
     return { startDate: null, endDate: null };
@@ -145,15 +131,11 @@ async function fetchNominationDates(viewNode: string) {
 export async function getAwards(): Promise<Award[]> {
   const brands = await getAwardBrands();
 
-  /* ---------------- FETCH RAW AWARDS ---------------- */
-
+  // Fetch all raw awards JSON
   const awardsRawArr = await Promise.all(
-    brands.map(async b => {
+    brands.map(async (b) => {
       try {
-        const res = await fetch(`${b.url}/node/content-menu/awards.json`, {
-          next: { revalidate: 300 }
-        });
-
+        const res = await safeFetch(`${b.url}/node/content-menu/awards.json`);
         const json = await res.json();
         return Array.isArray(json) ? json : [];
       } catch {
@@ -164,79 +146,44 @@ export async function getAwards(): Promise<Award[]> {
 
   let awardsRaw = awardsRawArr.flat();
 
-  /* ---------------- ATTACH BRAND + ID ---------------- */
-
+  // Attach brand + id
   awardsRaw = awardsRaw.map((a: any, idx: number) => {
-    const brand = brands.find(b =>
-      normalizeTitle(a.view_node).startsWith(normalizeTitle(b.url))
-    );
-
-    return {
-      ...a,
-      id: a.view_node || `award-${idx}`,
-      brand: brand?.brand || "sbr"
-    };
+    const brand = brands.find((b) => normalizeTitle(a.view_node).startsWith(normalizeTitle(b.url)));
+    return { ...a, id: a.view_node || `award-${idx}`, brand: brand?.brand || "sbr" };
   });
 
-  /* ---------------- REMOVE DUPLICATES ---------------- */
-
-  const uniqueMap = new Map<string, any>();
-
-  awardsRaw.forEach((a, idx) => {
-    if (!a.title || !a.field_date) return;
-
-    const dateOnly = new Date(a.field_date)
-      .toISOString()
-      .split("T")[0];
-
-    const key = normalizeTitle(a.title) + "_" + dateOnly;
-
-    if (!uniqueMap.has(key)) {
-      uniqueMap.set(key, {
-        ...a,
-        id: a.view_node || `award-${idx}`
-      });
-    }
-  });
-
+  // Remove duplicates by normalized title + date
+  const uniqueMap = new Map<string, Award>();
+  for (const a of awardsRaw) {
+    if (!a.title || !a.field_date) continue;
+    const key = normalizeTitle(a.title) + "_" + new Date(a.field_date).toISOString().split("T")[0];
+    if (!uniqueMap.has(key)) uniqueMap.set(key, a);
+  }
   const uniqueAwards = Array.from(uniqueMap.values());
 
-  /* ---------------- FETCH NOMINATION DATES ---------------- */
-
+  // Fetch nomination dates
   const awardsWithDates = await Promise.all(
-    uniqueAwards.map(async award => {
+    uniqueAwards.map(async (award) => {
       const dates = await fetchNominationDates(award.view_node);
       return { ...award, ...dates };
     })
   );
 
-  /* ---------------- FETCH IMAGES PER BRAND ---------------- */
-
-  const imageMapsArr = await Promise.all(
-    brands.map(b => fetchAwardImagesMap(b.url))
-  );
-
+  // Fetch images per brand
+  const imageMapsArr = await Promise.all(brands.map((b) => fetchAwardImagesMap(b.url)));
   const brandImageMaps: Record<string, Record<string, string>> = {};
-  brands.forEach((b, i) => {
-    brandImageMaps[b.brand] = imageMapsArr[i] || {};
-  });
+  brands.forEach((b, i) => (brandImageMaps[b.brand] = imageMapsArr[i] || {}));
 
-  /* ---------------- MAP IMAGES ---------------- */
-
-  const awardsWithImages = awardsWithDates.map(a => {
+  // Map images
+  const awardsWithImages = awardsWithDates.map((a) => {
     const brandMap = brandImageMaps[a.brand];
-
     if (!brandMap) return a;
 
     const normalizedAward = normalizeTitle(a.title);
-
     let image: string | undefined;
 
     for (const [scrapedTitle, scrapedImg] of Object.entries(brandMap)) {
-      if (
-        scrapedTitle.includes(normalizedAward) ||
-        normalizedAward.includes(scrapedTitle)
-      ) {
+      if (scrapedTitle.includes(normalizedAward) || normalizedAward.includes(scrapedTitle)) {
         image = scrapedImg;
         break;
       }
@@ -245,12 +192,9 @@ export async function getAwards(): Promise<Award[]> {
     return { ...a, image };
   });
 
-  /* ---------------- SORT ---------------- */
-
+  // Sort by field_date
   awardsWithImages.sort(
-    (a, b) =>
-      new Date(a.field_date).getTime() -
-      new Date(b.field_date).getTime()
+    (a, b) => new Date(a.field_date).getTime() - new Date(b.field_date).getTime()
   );
 
   console.log("Final Awards Count:", awardsWithImages.length);
