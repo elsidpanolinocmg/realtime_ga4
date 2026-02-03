@@ -16,7 +16,6 @@ interface BrandPageProps {
 }
 
 export default function BrandPageClient({ brand }: BrandPageProps) {
-  const awards: Award[] = getAwardBrands(brand);
   const searchParams = useSearchParams();
   const router = useRouter();
   const [siteConfig, setSiteConfig] = useState<any | null>(null);
