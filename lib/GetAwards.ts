@@ -47,6 +47,7 @@ export async function getAwardBrands(): Promise<Brand[]> {
     `${BASE_URL}/api/json-provider/dashboard-config/brand-all-properties`,
     { next: { revalidate: 300 } }
   );
+  console.log("Response status:", res.status);
 
   const config = await res.json();
 
