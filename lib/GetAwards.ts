@@ -1,7 +1,7 @@
 import * as cheerio from "cheerio";
 
 const BASE_URL =
-  process.env.JSON_PROVIDER_URL || process.env.NEXT_PUBLIC_BASE_URL;
+  process.env.JSON_PROVIDER_URL || process.env.NEXT_PUBLIC_SITE_URL;
 
 /* ---------------- TYPES ---------------- */
 
