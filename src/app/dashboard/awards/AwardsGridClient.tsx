@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import Countdown from "./Countdown";
 
 export interface Award {
@@ -27,7 +28,6 @@ function formatDate(dateStr?: string) {
 }
 
 /* ---------- Submission Status Helpers ---------- */
-
 function getSubmissionOpen(startDate?: string | null) {
   if (!startDate) return "Submission Closed";
 
@@ -55,21 +55,34 @@ function getSubmissionClose(endDate?: string | null) {
 }
 
 /* ---------- Component ---------- */
-
 export default function AwardsGridClient({ awards }: AwardsGridProps) {
   const now = new Date();
+  const tableRef = useRef<HTMLDivElement>(null);
 
   // Only upcoming awards
   const upcomingAwards = awards.filter(
     award => new Date(award.field_date) > now
   );
 
+  // Toggle fullscreen
+  const toggleFullscreen = () => {
+    if (!tableRef.current) return;
+
+    if (!document.fullscreenElement) {
+      tableRef.current.requestFullscreen().catch(err => {
+        console.error("Fullscreen failed:", err);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  };
+
   return (
-    <div className="flex flex-col justify-center h-full">
-      <table className="w-full border-collapse text-sm">
+    <div className="flex flex-col justify-center min-h-screen py-4 px-8 bg-white text-black" ref={tableRef}>
+      <table className="w-full border-collapse text-xs">
         <thead>
-          <tr className="bg-white text-center">
-            <th className="p-1">Award Title</th>
+          <tr className="bg-white text-center text-sm">
+            <th className="p-1" onClick={toggleFullscreen}>Award Title</th>
             <th className="p-1">Awards Night</th>
             <th className="p-1">Awards Night Starts In</th>
             <th className="p-1">Submission Open In</th>
@@ -80,9 +93,8 @@ export default function AwardsGridClient({ awards }: AwardsGridProps) {
         <tbody>
           {upcomingAwards.map((award, idx) => (
             <tr key={award.id || idx} className="text-center">
-
               {/* Award Title + Image */}
-              <td className="flex items-center gap-2 p-1 justify-start">
+              <td className="flex items-center gap-2 p-px justify-start">
                 {award.image && (
                   <img
                     src={award.image}
@@ -90,35 +102,22 @@ export default function AwardsGridClient({ awards }: AwardsGridProps) {
                     className="w-8 h-8 object-contain"
                   />
                 )}
-
-                <span
-                  dangerouslySetInnerHTML={{ __html: award.title }}
-                />
+                <span dangerouslySetInnerHTML={{ __html: award.title }} />
               </td>
 
               {/* Awards Night Date */}
-              <td className="p-1">
-                {formatDate(award.field_date)}
-              </td>
+              <td className="p-1">{formatDate(award.field_date)}</td>
 
               {/* Awards Night Countdown */}
               <td className="p-1">
-                <Countdown
-                  target={award.field_date}
-                  done="Awards Ended"
-                />
+                <Countdown target={award.field_date} done="Awards Ended" />
               </td>
 
               {/* Submission Open */}
-              <td className="p-1">
-                {getSubmissionOpen(award.startDate)}
-              </td>
+              <td className="p-1">{getSubmissionOpen(award.startDate)}</td>
 
               {/* Submission Close */}
-              <td className="p-1">
-                {getSubmissionClose(award.endDate)}
-              </td>
-
+              <td className="p-1">{getSubmissionClose(award.endDate)}</td>
             </tr>
           ))}
         </tbody>
