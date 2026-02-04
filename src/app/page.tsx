@@ -30,6 +30,9 @@ export default function Home() {
         <Link href="/dashboard/editorial/qsr-aus" className="hover:underline ml-4">
           QSR AUS Editorial Dashboard
         </Link>
+        <Link href="/dashboard/awards" className="hover:underline">
+          Awards
+        </Link>
 
 
         <Link href="/all-active?grouped=true" className="hover:underline mt-4">
