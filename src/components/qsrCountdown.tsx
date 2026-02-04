@@ -1,6 +1,6 @@
 "use client";
 
-import Countdown from ".@src/components/Countdown";
+import Countdown from "./Countdown";
 
 export interface Award {
   title: string;
