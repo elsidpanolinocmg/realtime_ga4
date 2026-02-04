@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
-import { getAwards, Award } from "@/lib/GetAwards";
+import { getCollection } from "@/lib/mongodb";
+import { getAwards, Brand, Award } from "@/lib/GetAwards";
 
-/* ---------------- MODULE CACHE ---------------- */
 let cachedAwards: Award[] | null = null;
 let cacheTimestamp = 0;
-
-const CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
+const CACHE_DURATION = 7 * 24 * 60 * 60 * 1000;
 
 export async function GET(req: Request) {
   try {
@@ -13,34 +12,27 @@ export async function GET(req: Request) {
     const forceRefresh = searchParams.get("cache") === "false";
 
     const now = Date.now();
-
-    if (
-      cachedAwards &&
-      !forceRefresh &&
-      now - cacheTimestamp < CACHE_DURATION
-    ) {
-      console.log("API: Returning cached awards");
+    if (!forceRefresh && cachedAwards && now - cacheTimestamp < CACHE_DURATION) {
       return NextResponse.json(cachedAwards);
     }
 
-    console.log("API: Fetching fresh awards...");
+    // Get brands from MongoDB directly
+    const col = await getCollection("dashboard-config");
+    const doc = await col.findOne({ uid: "brand-all-properties" });
+    const config = doc?.data || {};
 
-    const awards = await getAwards();
+    const brands: Brand[] = Object.entries(config)
+      .filter(([, site]: any) => site?.awards && site?.url)
+      .map(([brand, site]: any) => ({ brand, ...site }));
+
+    const awards = await getAwards(brands);
 
     cachedAwards = awards;
     cacheTimestamp = now;
 
-    return NextResponse.json(awards, {
-      headers: {
-        "Cache-Control": "s-maxage=604800, stale-while-revalidate",
-      },
-    });
+    return NextResponse.json(awards);
   } catch (err) {
     console.error("API /awards failed:", err);
-
-    return NextResponse.json(
-      { error: "Failed to fetch awards" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch awards" }, { status: 500 });
   }
 }

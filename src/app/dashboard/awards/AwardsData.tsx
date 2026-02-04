@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import AwardsGridClient from "./AwardsGridClient";
 import { Award } from "@/lib/GetAwards";
 
@@ -9,17 +9,12 @@ export default function AwardsData() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchAwards() {
+    async function fetchData() {
       try {
         const params = new URLSearchParams(window.location.search);
-        const refresh = params.get("cache") === "false";
-
-        const res = await fetch(
-          `/api/awards${refresh ? "?cache=false" : ""}`,
-          { cache: "no-store" }
-        );
-
-        const data = await res.json();
+        const cacheParam = params.get("cache") === "false" ? "?cache=false" : "";
+        const res = await fetch(`/api/awards${cacheParam}`);
+        const data: Award[] = await res.json();
         setAwards(data);
       } catch (err) {
         console.error("Failed to fetch awards:", err);
@@ -27,17 +22,11 @@ export default function AwardsData() {
         setLoading(false);
       }
     }
-
-    fetchAwards();
+    fetchData();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen text-xl">
-        Loading Awards...
-      </div>
-    );
-  }
+  if (loading)
+    return <div className="flex justify-center items-center h-screen text-xl">Loading Awards...</div>;
 
   return <AwardsGridClient awards={awards} />;
 }
