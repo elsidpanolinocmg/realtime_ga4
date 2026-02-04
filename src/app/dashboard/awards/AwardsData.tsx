@@ -12,15 +12,14 @@ export default function AwardsData() {
     async function fetchAwards() {
       try {
         const params = new URLSearchParams(window.location.search);
-        const cacheParam = params.get("cache") === "false";
+        const refresh = params.get("cache") === "false";
 
-        // Add ?cache=false only if cache=false is in URL
-        const url = `${process.env.NEXT_PUBLIC_SITE_URL}/api/awards${
-          cacheParam ? "?cache=false" : ""
-        }`;
+        const res = await fetch(
+          `/api/awards${refresh ? "?cache=false" : ""}`,
+          { cache: "no-store" }
+        );
 
-        const res = await fetch(url, { cache: "no-store" });
-        const data: Award[] = await res.json();
+        const data = await res.json();
         setAwards(data);
       } catch (err) {
         console.error("Failed to fetch awards:", err);

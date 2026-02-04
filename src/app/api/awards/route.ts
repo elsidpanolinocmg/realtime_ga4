@@ -1,27 +1,46 @@
 import { NextResponse } from "next/server";
 import { getAwards, Award } from "@/lib/GetAwards";
 
-// Module-level cache (works reliably for API route instance)
+/* ---------------- MODULE CACHE ---------------- */
 let cachedAwards: Award[] | null = null;
 let cacheTimestamp = 0;
+
 const CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 export async function GET(req: Request) {
-  const url = new URL(req.url);
-  const forceRefresh = url.searchParams.get("cache") === "false";
-  const now = Date.now();
+  try {
+    const { searchParams } = new URL(req.url);
+    const forceRefresh = searchParams.get("cache") === "false";
 
-  if (!cachedAwards || now - cacheTimestamp > CACHE_DURATION || forceRefresh) {
-    try {
-      cachedAwards = await getAwards();
-      cacheTimestamp = now;
-      console.log("Fetched new awards and updated cache");
-    } catch (e) {
-      console.error("Failed to fetch awards, returning cached if available", e);
+    const now = Date.now();
+
+    if (
+      cachedAwards &&
+      !forceRefresh &&
+      now - cacheTimestamp < CACHE_DURATION
+    ) {
+      console.log("API: Returning cached awards");
+      return NextResponse.json(cachedAwards);
     }
-  } else {
-    console.log("Using cached awards");
-  }
 
-  return NextResponse.json(cachedAwards || []);
+    console.log("API: Fetching fresh awards...");
+
+    const awards = await getAwards();
+
+    cachedAwards = awards;
+    cacheTimestamp = now;
+
+    return NextResponse.json(awards, {
+      headers: {
+        "Cache-Control": "s-maxage=604800, stale-while-revalidate",
+      },
+    });
+  } catch (err) {
+    console.error("API /awards failed:", err);
+
+    return NextResponse.json(
+      { error: "Failed to fetch awards" },
+      { status: 500 }
+    );
+  }
 }
