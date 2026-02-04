@@ -4,9 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useSearchParams, useRouter } from "next/navigation";
 import EditorialBrandSettingsClient from "./BrandSettingsClient";
-import { getAwardBrands, Award } from "@/lib/qsrAwards";
 
-const BrandDashboard = dynamic(
+const AwardsDashboard = dynamic(
   () => import("@/src/components/BrandAwards"),
   { ssr: false }
 );
@@ -15,7 +14,7 @@ interface BrandPageProps {
   brand: string;
 }
 
-export default function BrandPageClient({ brand }: BrandPageProps) {
+export default function AwardsBrandClient({ brand }: BrandPageProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [siteConfig, setSiteConfig] = useState<any | null>(null);
@@ -24,7 +23,7 @@ export default function BrandPageClient({ brand }: BrandPageProps) {
   const hideTimer = useRef<NodeJS.Timeout | null>(null);
 
   const baseUrl =
-    process.env.JSON_PROVIDER_URL || process.env.NEXT_PUBLIC_BASE_URL;
+    process.env.JSON_PROVIDER_URL || process.env.NEXT_PUBLIC_SITE_URL;
 
   /* ---------------- FETCH BRAND CONFIG ---------------- */
   useEffect(() => {
@@ -84,8 +83,8 @@ export default function BrandPageClient({ brand }: BrandPageProps) {
     const queryString = updatedParams.toString();
     router.push(
       queryString
-        ? `/dashboard/editorial/${brand}?${queryString}`
-        : `/dashboard/editorial/${brand}`
+        ? `/dashboard/awards/${brand}?${queryString}`
+        : `/dashboard/awards/${brand}`
     );
 
     setShowSettings(false);
@@ -111,7 +110,7 @@ export default function BrandPageClient({ brand }: BrandPageProps) {
       onClick={handleUserActivity}
       onTouchStart={handleUserActivity}
     >
-      <BrandDashboard
+      <AwardsDashboard
         key={searchParams.toString()} // force re-render on param change
         brand={brand}
         siteConfig={siteConfig}

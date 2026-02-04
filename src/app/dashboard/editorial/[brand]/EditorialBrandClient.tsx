@@ -14,7 +14,7 @@ interface BrandPageProps {
   brand: string;
 }
 
-export default function BrandPageClient({ brand }: BrandPageProps) {
+export default function EditorialBrandClient({ brand }: BrandPageProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [siteConfig, setSiteConfig] = useState<any | null>(null);

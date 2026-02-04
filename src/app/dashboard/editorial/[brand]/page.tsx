@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import BrandPageClient from "./EditorialBrandClient";
+import EditorialBrandClient from "./EditorialBrandClient";
 
 interface EditorialPageProps {
   params: { brand: string } | Promise<{ brand: string }>;
@@ -12,7 +12,7 @@ export default async function EditorialPage({ params }: EditorialPageProps) {
 
   return (
     <Suspense fallback={<div className="h-screen flex items-center justify-center">Loading…</div>}>
-      <BrandPageClient brand={brand} />
+      <EditorialBrandClient brand={brand} />
     </Suspense>
   );
 }
