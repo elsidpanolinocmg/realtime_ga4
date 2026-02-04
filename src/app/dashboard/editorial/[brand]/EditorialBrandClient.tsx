@@ -23,7 +23,7 @@ export default function BrandPageClient({ brand }: BrandPageProps) {
   const hideTimer = useRef<NodeJS.Timeout | null>(null);
 
   const baseUrl =
-    process.env.JSON_PROVIDER_URL || process.env.NEXT_PUBLIC_BASE_URL;
+    process.env.JSON_PROVIDER_URL || process.env.NEXT_PUBLIC_SITE_URL;
 
   /* ---------------- FETCH BRAND CONFIG ---------------- */
   useEffect(() => {
