@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import Countdown from "./Countdown";
+import Countdown from "@/src/components/Countdown";
 
 export interface Award {
   id: string;

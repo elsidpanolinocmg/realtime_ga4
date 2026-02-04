@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { useSearchParams, useRouter } from "next/navigation";
 import { EDITORIAL_DEFAULTS } from "./default";
 
-const BrandDashboard = dynamic(() => import("@/src/components/qsrDashboard"), { ssr: false });
+const BrandDashboard = dynamic(() => import("@/src/components/BrandAwards"), { ssr: false });
 
 interface BrandEntry {
   brand: string;

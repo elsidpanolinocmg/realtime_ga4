@@ -7,7 +7,7 @@ import EditorialBrandSettingsClient from "./BrandSettingsClient";
 import { getAwardBrands, Award } from "@/lib/qsrAwards";
 
 const BrandDashboard = dynamic(
-  () => import("@/src/components/qsrDashboard"),
+  () => import("@/src/components/BrandAwards"),
   { ssr: false }
 );
 
