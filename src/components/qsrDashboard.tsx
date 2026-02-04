@@ -55,9 +55,9 @@ export default function BrandDashboard({
   return (
     <div className="bg-white flex flex-col min-h-screen md:h-screen">
       {/* ================= HEADER ================= */}
-      <header className="flex flex-col md:flex-row items-center gap-4 md:gap-6 px-3 py-4 shrink-0 overflow-x-auto md:overflow-x-visible">
-        {/* Left logo */}
-        <div className="flex justify-between w-full md:w-fit">
+      <header className="flex items-center justify-between px-3 py-4 shrink-0 overflow-x-auto md:overflow-x-visible">
+        {/* Left block */}
+        <div className="flex items-center gap-4">
           {siteConfig?.image && (
             <div className="relative h-14 w-40 md:h-24 md:w-64">
               <Image
@@ -70,14 +70,15 @@ export default function BrandDashboard({
             </div>
           )}
 
+          {/* Mobile CMG toggle */}
           <div
             onClick={toggleFullscreen}
-            className="relative h-12 w-20 md:h-24 md:w-32 cursor-pointer block md:hidden"
+            className="relative h-12 w-20 cursor-pointer md:hidden"
             title="Toggle fullscreen"
           >
             <Image
               src="/logo/cmg.png"
-              alt="Charlton Media Group"
+              alt="Media Group"
               fill
               className="object-contain"
               priority
@@ -85,16 +86,16 @@ export default function BrandDashboard({
           </div>
         </div>
 
-        {/* CMG fullscreen toggle */}
-        <div className="flex w-fit">
+        {/* Right block – desktop CMG toggle */}
+        <div className="hidden md:flex">
           <div
             onClick={toggleFullscreen}
-            className="relative h-12 w-20 md:h-24 md:w-32 cursor-pointer hidden md:block"
+            className="relative h-24 w-32 cursor-pointer"
             title="Toggle fullscreen"
           >
             <Image
               src="/logo/cmg.png"
-              alt="Charlton Media Group"
+              alt="Media Group"
               fill
               className="object-contain"
               priority
