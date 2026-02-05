@@ -37,19 +37,23 @@ const upcomingAwards = awards.filter(
   award => new Date(award.field_date) > now
 );
 */
+  // 🔽 Use this instead if you only want the earliest upcoming award
+  const upcomingAwards =
+    awards
+      ?.filter(
+        (award): award is Award =>
+          !!award && !!award.field_date && !isNaN(new Date(award.field_date).getTime())
+      )
+      .filter(award => new Date(award.field_date) > now)
+      .sort(
+        (a, b) =>
+          new Date(a.field_date).getTime() -
+          new Date(b.field_date).getTime()
+      )
+      .slice(0, 1) ?? [];
 
-
-// 🔽 Use this instead if you only want the earliest upcoming award
-const upcomingAwards = awards
-  .filter(award => new Date(award.field_date) > now)
-  .sort(
-    (a, b) =>
-      new Date(a.field_date).getTime() -
-      new Date(b.field_date).getTime()
-  )
-  .slice(0, 1);
-
-
+  if (!upcomingAwards.length) return null;
+  
   return (
     <div className="flex-col md:flex-row gap-4 justify-center h-full text-lg text-gray-900">
 
