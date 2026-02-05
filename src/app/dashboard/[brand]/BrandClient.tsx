@@ -33,6 +33,7 @@ export default function BrandPageClient({ brand }: BrandPageProps) {
   const router = useRouter();
 
   const [siteConfig, setSiteConfig] = useState<any | null>(null);
+  const [awardsConfig, setAwardsConfig] = useState<any | null>(null);
   const [showControls, setShowControls] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -60,15 +61,15 @@ export default function BrandPageClient({ brand }: BrandPageProps) {
       )}
       activeNowIntervalms={Number(
         searchParams.get("activeNowIntervalms") ??
-          DEFAULTS.activeNowIntervalms
+        DEFAULTS.activeNowIntervalms
       )}
       activeTodayIntervalms={Number(
         searchParams.get("activeTodayIntervalms") ??
-          DEFAULTS.activeTodayIntervalms
+        DEFAULTS.activeTodayIntervalms
       )}
       videoDurationTime={Number(
         searchParams.get("videoDisplayTime") ??
-          DEFAULTS.videoDisplayTime
+        DEFAULTS.videoDisplayTime
       )}
     />,
 
@@ -76,6 +77,7 @@ export default function BrandPageClient({ brand }: BrandPageProps) {
       key="awards"
       brand={brand}
       siteConfig={siteConfig}
+      awardsConfig={awardsConfig}
     />,
   ];
 
@@ -90,6 +92,20 @@ export default function BrandPageClient({ brand }: BrandPageProps) {
     )
       .then((r) => r.json())
       .then(setSiteConfig)
+      .catch(() => console.error("Failed to load brand config"));
+  }, [brand, baseUrl]);
+
+  /* ---------------- FETCH AWARDS CONFIG ---------------- */
+
+  useEffect(() => {
+    if (!baseUrl) return;
+
+    fetch(
+      `${baseUrl}/api/awards/${brand}`,
+      { cache: "no-store" }
+    )
+      .then((r) => r.json())
+      .then(setAwardsConfig)
       .catch(() => console.error("Failed to load brand config"));
   }, [brand, baseUrl]);
 

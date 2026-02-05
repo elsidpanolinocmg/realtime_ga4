@@ -5,11 +5,13 @@ import Image from "next/image";
 import TickerStrip from "./TickerStrip";
 import TickerCard from "./TickerCard";
 import VideoRotator from "./VideoRotator";
+import AwardCountdown from "./AwardCountdown";
 import { useState, useEffect } from "react";
 
 interface BrandDashboardProps {
   brand: string;
   siteConfig: any;
+  awardsConfig: any;
   stripspeed?: number;
   cardduration?: number;
   activeNowIntervalms?: number;
@@ -21,6 +23,7 @@ interface BrandDashboardProps {
 export default function AwardsDashboard({
   brand,
   siteConfig,
+  awardsConfig,
   stripspeed = 100,
   cardduration = 4000,
   videoDurationTime = 30
@@ -38,6 +41,10 @@ export default function AwardsDashboard({
     safeReplace(siteConfig?.url) + "/latest-videos.xml";
 
   const [showVideoRotator, setShowVideoRotator] = useState(true);
+
+  const awards = Array.isArray(awardsConfig) ? awardsConfig : [awardsConfig];
+  console.log(awards)
+
 
   useEffect(() => {
     if (!videosFeedUrl) setShowVideoRotator(false);
@@ -106,8 +113,8 @@ export default function AwardsDashboard({
 
       {/* ================= MAIN CONTENT ================= */}
       <main className="flex-1 flex flex-col md:flex-row items-stretch justify-center px-3 md:px-8 py-4 gap-8 pb-[100px]">
-        <div className="w-full max-w-[1920px] flex flex-col md:flex-row gap-8 px-3 md:px-8">
-
+        <div className="w-full max-w-[1920px] flex flex-col md:flex-row justify-between gap-8 px-3 md:px-8 ">
+          <AwardCountdown awards={awards} />
           {showVideoRotator && (
             <div className="w-full md:w-[clamp(40%,100vh,80%)] flex flex-col h-full overflow-hidden">
               <VideoRotator
@@ -117,7 +124,6 @@ export default function AwardsDashboard({
               />
             </div>
           )}
-
         </div>
       </main>
 

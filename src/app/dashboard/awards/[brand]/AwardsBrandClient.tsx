@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { useSearchParams, useRouter } from "next/navigation";
 import EditorialBrandSettingsClient from "./BrandSettingsClient";
 
+
 const AwardsDashboard = dynamic(
   () => import("@/src/components/BrandAwards"),
   { ssr: false }
@@ -18,6 +19,7 @@ export default function AwardsBrandClient({ brand }: BrandPageProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [siteConfig, setSiteConfig] = useState<any | null>(null);
+  const [awardsConfig, setAwardsConfig] = useState<any | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [showControls, setShowControls] = useState(false);
   const hideTimer = useRef<NodeJS.Timeout | null>(null);
@@ -35,6 +37,7 @@ export default function AwardsBrandClient({ brand }: BrandPageProps) {
           `${baseUrl}/api/json-provider/dashboard-config/brand-all-properties/${brand}`,
           { cache: "no-store" }
         );
+        console.log("test: ", res)
         if (!res.ok) throw new Error("Brand not found");
         setSiteConfig(await res.json());
       } catch {
@@ -51,6 +54,35 @@ export default function AwardsBrandClient({ brand }: BrandPageProps) {
     };
 
     fetchBrandConfig();
+  }, [brand, baseUrl]);
+
+    /* ---------------- FETCH BRAND CONFIG ---------------- */
+  useEffect(() => {
+    if (!baseUrl) return;
+
+    const fetchAwardConfig = async () => {
+      try {
+        const res = await fetch(
+          `${baseUrl}/api/awards/${brand}`,
+          { cache: "no-store" }
+        );
+        console.log("test: ", res)
+        if (!res.ok) throw new Error("Brand not found");
+        setAwardsConfig(await res.json());
+      } catch {
+        try {
+          const fallback = await fetch(
+            `${baseUrl}/api/awards/sbr`,
+            { cache: "no-store" }
+          );
+          setAwardsConfig(await fallback.json());
+        } catch {
+          console.error("Failed to load brand config");
+        }
+      }
+    };
+
+    fetchAwardConfig();
   }, [brand, baseUrl]);
 
   /* ---------------- DASHBOARD PARAMS ---------------- */
@@ -114,6 +146,7 @@ export default function AwardsBrandClient({ brand }: BrandPageProps) {
         key={searchParams.toString()} // force re-render on param change
         brand={brand}
         siteConfig={siteConfig}
+        awardsConfig={awardsConfig}
         stripspeed={stripspeed}
         cardduration={cardduration}
         activeNowIntervalms={activeNowIntervalms}

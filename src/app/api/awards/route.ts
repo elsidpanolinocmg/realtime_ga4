@@ -2,8 +2,12 @@ import { NextResponse } from "next/server";
 import { getCollection } from "@/lib/mongodb";
 import { getAwards, Brand, Award } from "@/lib/GetAwards";
 
-let cachedAwards: Award[] | null = null;
-let cacheTimestamp = 0;
+interface BrandCache {
+  awards: Award[];
+  timestamp: number;
+}
+
+const brandAwardsCache: Record<string, BrandCache> = {};
 const CACHE_DURATION = 7 * 24 * 60 * 60 * 1000;
 
 export async function GET(req: Request) {
@@ -12,11 +16,8 @@ export async function GET(req: Request) {
     const forceRefresh = searchParams.get("cache") === "false";
 
     const now = Date.now();
-    if (!forceRefresh && cachedAwards && now - cacheTimestamp < CACHE_DURATION) {
-      return NextResponse.json(cachedAwards);
-    }
 
-    // Get brands from MongoDB directly
+    // Fetch all brands from MongoDB
     const col = await getCollection("dashboard-config");
     const doc = await col.findOne({ uid: "brand-all-properties" });
     const config = doc?.data || {};
@@ -25,12 +26,23 @@ export async function GET(req: Request) {
       .filter(([, site]: any) => site?.awards && site?.url)
       .map(([brand, site]: any) => ({ brand, ...site }));
 
-    const awards = await getAwards(brands);
+    // Prepare awards per brand and update cache
+    const awardsPromises = brands.map(async (b) => {
+      const cached = brandAwardsCache[b.brand];
+      if (!forceRefresh && cached && now - cached.timestamp < CACHE_DURATION) {
+        return cached.awards;
+      }
 
-    cachedAwards = awards;
-    cacheTimestamp = now;
+      const awards = await getAwards([b]);
+      brandAwardsCache[b.brand] = { awards, timestamp: now };
+      return awards;
+    });
 
-    return NextResponse.json(awards);
+    // Flatten array of arrays
+    const awardsArrays = await Promise.all(awardsPromises);
+    const allAwards = awardsArrays.flat();
+
+    return NextResponse.json(allAwards);
   } catch (err) {
     console.error("API /awards failed:", err);
     return NextResponse.json({ error: "Failed to fetch awards" }, { status: 500 });
