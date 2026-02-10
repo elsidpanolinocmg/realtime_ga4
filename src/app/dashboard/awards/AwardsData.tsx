@@ -16,6 +16,7 @@ export default function AwardsData() {
         const res = await fetch(`/api/awards${cacheParam}`);
         const data: Award[] = await res.json();
         setAwards(data);
+        console.log(data)
       } catch (err) {
         console.error("Failed to fetch awards:", err);
       } finally {
